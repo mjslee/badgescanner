@@ -2,18 +2,17 @@ import TUIO.*; // For reacTIVision
 import java.util.*; // for Vector class
 TuioProcessing tuioClient;
 
-String filename = "logs/"+leadZero(day())+"-"+leadZero(hour())+"-"+leadZero(minute())+".csv";
 
+// Initialize the output file for logging participant + timestamps
+String filename = "logs/"+leadZero(day())+"-"+leadZero(hour())+"-"+leadZero(minute())+".csv";
 PrintWriter logfile;
 
-// these are some helper variables which are used
-// to create scalable graphical feedback
+// Initialize helper variables to create scalable graphical feedback
 float cursor_size = 15;
-float object_size = 200; //orig:60
+float object_size = 200;
 float table_size = 760;
 float scale_factor = 1;
 PFont font;
-
 PImage a;
 
 void setup()
@@ -22,7 +21,6 @@ void setup()
   logfile.flush();
   logfile.close();
   
-  //PrintWriter output = createWriter("outputlog.csv");
   //size(screen.width,screen.height);
   size(640,480);
   noStroke();
@@ -56,15 +54,13 @@ void draw()
   for (int i=0;i<tuioObjectList.size();i++) {
      
      TuioObject tobj = (TuioObject)tuioObjectList.elementAt(i);
-     //stroke(200,200,200);
-     //fill(100,100,100);
+     
      pushMatrix();
      translate(tobj.getScreenX(width),tobj.getScreenY(height));
-     //rotate(tobj.getAngle());
-     //rect(-obj_size/2,-obj_size/2,obj_size,obj_size);
      
+     // If an image of the participant exists, show it. Otherwise, show the invalid.jpg image instead.
      try{
-       a = loadImage("photos/"+getImage(tobj.getSymbolID()));
+       a = loadImage("photos/"+getInfo("image", tobj.getSymbolID()));
        image(a, -obj_size/2,-obj_size/2,obj_size,obj_size);
      }
      catch(Exception e ){
@@ -81,7 +77,7 @@ void draw()
         fill(255,0,0);
       }
      
-     text(""+tobj.getSymbolID()+": " + getName(tobj.getSymbolID()) + ", " + getType(tobj.getSymbolID()) + checkMark(tobj.getSymbolID()), tobj.getScreenX(width)+70, tobj.getScreenY(height));
+     text(""+tobj.getSymbolID()+": " + getInfo("name", tobj.getSymbolID()) + ", " + getInfo("type", tobj.getSymbolID()) + checkMark(tobj.getSymbolID()), tobj.getScreenX(width)+70, tobj.getScreenY(height));
    }
 
 }
@@ -94,14 +90,14 @@ void addTuioObject(TuioObject tobj) {
 
 // called when an object is removed from the scene
 void removeTuioObject(TuioObject tobj) {
-  //println("remove object "+getName(tobj.getSymbolID())+" ("+tobj.getSessionID()+")");
+
   if (!checkedIn[tobj.getSymbolID()]){
-    println("Checked in: "+getName(tobj.getSymbolID()));
+    println("Checked in: "+getInfo("name", tobj.getSymbolID()));
     checkedIn[tobj.getSymbolID()] = true;
-    logger(getFid(tobj.getSymbolID())+","+getName(tobj.getSymbolID())+","+getEmail(tobj.getSymbolID())+","+stringTime()+","+numTime());
+    logger(getInfo("fid", tobj.getSymbolID())+","+getInfo("name", tobj.getSymbolID())+","+getInfo("email", tobj.getSymbolID())+","+stringTime()+","+numTime());
   }
   else{
-     println("\""+getName(tobj.getSymbolID())+"\" has already been checked in.");
+     println("\""+getInfo("name", tobj.getSymbolID())+"\" has already been checked in.");
   }
   
 }
@@ -112,81 +108,73 @@ void updateTuioObject (TuioObject tobj) {
 
 // called when a cursor is added to the scene
 void addTuioCursor(TuioCursor tcur) {
-  //println("add cursor "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY());
 }
 
 // called when a cursor is moved
 void updateTuioCursor (TuioCursor tcur) {
-/*  println("update cursor "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY()
-          +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
-          */
 }
 
 // called when a cursor is removed from the scene
 void removeTuioCursor(TuioCursor tcur) {
-  //println("remove cursor "+tcur.getCursorID()+" ("+tcur.getSessionID()+")");
 }
 
-// called after each message bundle
-// representing the end of an image frame
+// called after each message bundle, representing the end of an image frame
 void refresh(TuioTime bundleTime) { 
   redraw();
 }
 
-String getName(int id) {
+
+// Returns the participant xxx at given ID
+String getInfo (String what, int id) {
+  
   String s = "(invalid)";
-  try
-  {
-    s = participants[id].name;
+  
+  if (what.equals("name") == true) {
+    try
+    {
+      s = participants[id].name;
+    }
+    catch(ArrayIndexOutOfBoundsException e ){}
+    catch(NullPointerException e ) {}
   }
-  catch( ArrayIndexOutOfBoundsException e ){}
-  catch(NullPointerException e ) {}
-    return s;
+  else if (what.equals("type") == true) {
+    try
+    {
+      s = participants[id].type;
+    }
+    catch(ArrayIndexOutOfBoundsException e ){}
+    catch(NullPointerException e ) {}
+  }
+  else if (what.equals("fid") == true) {
+    try
+    {
+      s = "" + participants[id].fidID;
+    }
+    catch(ArrayIndexOutOfBoundsException e ){}
+    catch(NullPointerException e ) {}
+  }
+  else if (what.equals("email") == true) {
+    try
+    {
+      s = participants[id].email;
+    }
+    catch(ArrayIndexOutOfBoundsException e ){}
+    catch(NullPointerException e ) {}
+  }
+  else if (what.equals("image") == true) {
+    s = "invalid.jpg";
+    try
+    {
+      s = participants[id].photo;
+    }
+    catch(ArrayIndexOutOfBoundsException e ){}
+    catch(NullPointerException e ) {}
+  }
+ 
+  return s;
 }
 
-String getType(int id) {
-  String s = "(invalid)";
-  try
-  {
-    s = participants[id].type;
-  }
-  catch( ArrayIndexOutOfBoundsException e ){}
-  catch(NullPointerException e ) {}
-    return s;
-}
 
-String getFid(int id) {
-  String s = "(invalid)";
-  try
-  {
-    s = "" + participants[id].fidID;
-  }
-  catch( ArrayIndexOutOfBoundsException e ){}
-  catch(NullPointerException e ) {}
-    return s;
-}
-String getEmail(int id) {
-  String s = "(invalid)";
-  try
-  {
-    s = participants[id].email;
-  }
-  catch( ArrayIndexOutOfBoundsException e ){}
-  catch(NullPointerException e ) {}
-    return s;
-}
-
-
-String getImage(int id) {
-  String s = "invalid.jpg";
-  try
-  {
-    s = participants[id].photo;
-  }
-  catch( ArrayIndexOutOfBoundsException e ){}
-  catch(NullPointerException e ) {}
-    return s;
-}
 
 
 String checkMark(int id){
@@ -237,8 +225,6 @@ class Participant
   String date;
   String time;
   String type;
-  //String fname;
-  //String lname;
   
   void newOut() {
     println( "Imported new participant: ("+fidID+") "+name+", "+ type +" ,"+photo);
@@ -272,8 +258,6 @@ class Participant
     name = n;
     email = e;
     type = t;
-    //lname = ln.replaceAll("\\s+$","");
-    //fname = fn.replaceAll("\\s+$","");
     photo = makePhotoName(email);
   }
 }
