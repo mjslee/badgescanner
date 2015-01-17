@@ -1,5 +1,5 @@
 # badgescanner
-Conference badge scanner (with timestamp) for user with reacTIVision.
+Conference badge scanner (with timestamp) for use with reacTIVision.
 
 Tested using Processing 2.2.1 (processing.org) and reacTIVision 1.5 (http://reactivision.sourceforge.net)
 
