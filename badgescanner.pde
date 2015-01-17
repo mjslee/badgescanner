@@ -1,4 +1,5 @@
-import TUIO.*;
+import TUIO.*; // For reacTIVision
+import java.util.*; // for Vector class
 TuioProcessing tuioClient;
 
 String filename = "logs/"+leadZero(day())+"-"+leadZero(hour())+"-"+leadZero(minute())+".csv";
