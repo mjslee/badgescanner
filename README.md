@@ -4,7 +4,7 @@ Conference badge scanner (with timestamp) for use with reacTIVision.
 Tested using Processing 2.2.1 (processing.org) and reacTIVision 1.5 (http://reactivision.sourceforge.net)
 
 Before running the software:
-1. Setup people.csv with the names and ID numbers of those you want to coorespond to the reacTIVision fiducial makers. Columns are as follows: fiducial_id, full_name, internal_id, group. (internal_id can be whatever you want; group can be whatever you want too, typically we use UG for undegrads, G for graduates, and YP for young professionnals)
+1. Setup people.csv with the names and ID numbers of those you want to coorespond to the reacTIVision fiducial makers. Columns are as follows: fiducial_id, full_name, internal_id, group. (internal_id can be whatever you want; group can be whatever you want too, typically we use UG for undegrads, G for graduates, and YP for young professionals)
 2. Setup the /photos/ directory to correspond with the IDs (or names) from the CSV file. These can be JPG or PNG, but in one format for all photos. Person with fiducial ID #1 should be 1.jpg
 
 To run the software:
